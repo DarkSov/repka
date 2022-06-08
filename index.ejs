@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <% if (user) {%>
+    <title>Welcome, <%= user.username %></title>
+    <% } else { %>
+    <title>Log in</title>
+    <% } %>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <% if (user) {%>
+    <h1>WELCOME BACK <%= locals.currentUser.username %></h1>
+    <a href="/log-out">LOG OUT</a>
+    <form action="/save-github-token" method="POST">
+      <label for="githubToken">Github token</label>
+      <input name="githubToken" type="password" />
+      <button>Save</button>
+    </form>
+    <form action="/save-google-spreadsheet" id="spreadsheet-form" method="POST">
+      <label for="spreadsheetId">Google spreadsheet ID</label>
+      <input name="spreadsheetId" type="text" required />
+      <label for="spreadsheetName">Name</label>
+      <input name="spreadsheetName" type="text" required />
+      <label for="nameRow">Student name row</label>
+      <input name="nameRow" type="number" required />
+      <div class="task-list"></div>
+      <button type="submit">Save</button>
+    </form>
+    <button id="add-task">Add task</button>
+
+    <select name="sheets" id="sheets-select">
+      <option value="">Choose spreadsheet</option>
+      <% locals.currentUser.sheets.forEach(function(sheet) { %>
+      <option value="<%= sheet.id %>"><%= sheet.name %></option>
+      <% }); %>
+    </select>
+    <div id="sheet"></div>
+    <div id="student-info"></div>
+    <script
+      type="text/javascript"
+      src="scripts/spreadsheetManagement.js"
+    ></script>
+    <% } else { %>
+
+    <div class="container justify-content-center align-items-center ">
+      <h1 class="text-center mb-5">Log in</h1>
+      <form action="/log-in" method="POST">
+        <label for="username">Username</label>
+        <input name="username" placeholder="username" type="text" />
+        <label for="password">Password</label>
+        <input name="password" type="password" />
+        <button>Log In</button>
+      </form>
+      <p>Not logged in? <a id="sign-up" href="/sign-up"> Sign Up </a></p>
+    </div>
+
+    <%}%>
+  </body>
+</html>
