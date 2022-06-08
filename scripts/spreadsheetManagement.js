@@ -1,10 +1,14 @@
 let sheetsSelect = document.getElementById("sheets-select");
 let sheet = document.getElementById("sheet");
 let studentInfo = document.getElementById("student-info");
+const studentListGroup = document.getElementById("student-list-group");
 
 sheetsSelect.addEventListener("change", (event) => {
-  sheet.innerHTML = "";
+  studentListGroup.innerHTML = `<div id="spinner" class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>`;
   const sheetId = sheetsSelect.value;
+  const spinner = document.getElementById("spinner");
   if (sheetId == "") return;
   fetch(`/get-google-spreadsheet?sheetId=${sheetId}`)
     .then((response) => response.json())
@@ -12,8 +16,8 @@ sheetsSelect.addEventListener("change", (event) => {
       console.log(data);
       data.sheetData.forEach((row, index) => {
         if (index != 0) {
-          let student = document.createElement("div");
-          student.className = "student";
+          let student = document.createElement("li");
+          student.classList.add("list-group-item", "student");
           student.innerHTML = row[data.nameRow - 1];
           student.id = index;
           student.addEventListener("click", (event) => {
@@ -21,7 +25,7 @@ sheetsSelect.addEventListener("change", (event) => {
             const studentId = event.target.id;
             data.tasks.forEach((task) => {
               const taskName = task.name;
-              const taskRow = task.row;
+              const taskRow = task.row - 1;
               const taskLink = data.sheetData[studentId][taskRow];
               if (taskLink != "") {
                 const username = taskLink.split("/")[3];
@@ -41,23 +45,29 @@ sheetsSelect.addEventListener("change", (event) => {
               }
             });
           });
-          sheet.appendChild(student);
+          studentListGroup.appendChild(student);
         }
       });
+      spinner.remove();
     });
 });
 
-let sheetForm = document.getElementById("spreadsheet-form");
+let taskList = document.getElementById("task-list");
 let addTaskButton = document.getElementById("add-task");
 addTaskButton.addEventListener("click", (event) => {
+  event.preventDefault();
   const taskName = document.createElement("input");
+  taskName.classList.add("form-control", "my-2");
   taskName.setAttribute("type", "text");
   taskName.setAttribute("name", "taskName");
   taskName.setAttribute("placeholder", "Task name");
-  sheetForm.appendChild(taskName);
+  taskName.required = true;
+  taskList.appendChild(taskName);
   const taskRow = document.createElement("input");
+  taskRow.classList.add("form-control", "my-2");
   taskRow.setAttribute("type", "number");
   taskRow.setAttribute("name", "taskRow");
   taskRow.setAttribute("placeholder", "Row");
-  sheetForm.appendChild(taskRow);
+  taskRow.required = true;
+  taskList.appendChild(taskRow);
 });

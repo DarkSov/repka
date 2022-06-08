@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <% if (user) {%>
     <title>Welcome, <%= user.username %></title>
+    <link rel="stylesheet" href="css/dashboard.css" />
     <% } else { %>
     <title>Log in</title>
     <link rel="stylesheet" href="css/login.css" />
@@ -24,41 +25,118 @@
     <% if (message.length>0) { %>
     <div class="alert alert-danger" role="alert"><%= message %></div>
     <% } %> <% if (user) {%>
-    <div class="container">
+    <nav class="navbar navbar-expand-lg bg-light p-0">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            class="m-0 p-0"
+            src="img/logo.png"
+            alt="Repka"
+            width="60"
+            height="60"
+          />
+        </a>
+        <div class="d-flex flex-row">
+          <p class="mx-3"><%= locals.currentUser.username %></p>
+          <a class="text-right" href="/log-out">Log out</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid m-3">
       <div class="row justify-content-between">
         <div class="col-2">
-          <h1 class="fs-3">Hi, <%= locals.currentUser.username %></h1>
+          <select name="sheets" id="sheets-select">
+            <option value="">Choose spreadsheet</option>
+            <% locals.currentUser.sheets.forEach(function(sheet) { %>
+            <option value="<%= sheet.id %>"><%= sheet.name %></option>
+            <% }); %>
+          </select>
         </div>
-        <div class="col-2">
-          <a class="text-right" href="/log-out">Log out</a>
+        <div class="ml-auto float-right col-1">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasExample"
+            aria-controls="offcanvasExample"
+          >
+            Settings
+          </button>
         </div>
       </div>
     </div>
 
-    <form action="/save-github-token" method="POST">
-      <label for="githubToken">Github token</label>
-      <input name="githubToken" type="password" />
-      <button>Save</button>
-    </form>
-    <form action="/save-google-spreadsheet" id="spreadsheet-form" method="POST">
-      <label for="spreadsheetId">Google spreadsheet ID</label>
-      <input name="spreadsheetId" type="text" required />
-      <label for="spreadsheetName">Name</label>
-      <input name="spreadsheetName" type="text" required />
-      <label for="nameRow">Student name row</label>
-      <input name="nameRow" type="number" required />
-      <div class="task-list"></div>
-      <button type="submit">Save</button>
-    </form>
-    <button id="add-task">Add task</button>
+    <div
+      class="offcanvas offcanvas-end"
+      tabindex="-1"
+      id="offcanvasExample"
+      aria-labelledby="offcanvasExampleLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Settings</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="mb-5">
+          <p class="fw-bold">Github settings</p>
+          <form action="/save-github-token" class="form" method="POST">
+            <label for="githubToken">Github token</label>
+            <div class="input-group mb-3">
+              <input
+                name="githubToken"
+                class="form-control"
+                type="password"
+                placeholder="token"
+                required
+              />
+              <button class="btn btn-outline-secondary" type="submit">
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
 
-    <select name="sheets" id="sheets-select">
-      <option value="">Choose spreadsheet</option>
-      <% locals.currentUser.sheets.forEach(function(sheet) { %>
-      <option value="<%= sheet.id %>"><%= sheet.name %></option>
-      <% }); %>
-    </select>
-    <div id="sheet"></div>
+        <div class="mt-4">
+          <p class="fw-bold">Spreadsheets settings</p>
+          <form
+            class="form"
+            action="/save-google-spreadsheet"
+            id="spreadsheet-form"
+            method="POST"
+          >
+            <label for="spreadsheetId">Google spreadsheet ID</label>
+            <input
+              class="form-control"
+              name="spreadsheetId"
+              type="text"
+              required
+            />
+            <label for="spreadsheetName">Name</label>
+            <input
+              class="form-control"
+              name="spreadsheetName"
+              type="text"
+              required
+            />
+            <label for="nameRow">Student name row</label>
+            <input class="form-control" name="nameRow" type="number" required />
+            <div id="task-list"></div>
+            <div class="d-flex justify-content-between mt-2">
+              <button class="btn btn-primary" type="submit">Save</button>
+              <button class="btn btn-secondary" id="add-task">Add task</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <ul class="list-group" id="student-list-group"></ul>
     <div id="student-info"></div>
     <script
       type="text/javascript"

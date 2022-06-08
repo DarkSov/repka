@@ -16,22 +16,44 @@
   </head>
   <body>
     <div class="container">
-      <h1>Sign Up</h1>
-      <form action="/sign-up" method="POST">
-        <label for="username">Username</label>
-        <input
-          name="username"
-          placeholder="username"
-          minlength="4"
-          type="text"
-          required
-        />
-        <label for="password">Password</label>
-        <input name="password" type="password" minlength="6" required />
-        <button>Sign Up</button>
-      </form>
-      <a id="log-in" href="/"> Log in </a>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <form class="form" action="/sign-up" method="POST">
+            <h3 class="text-center">Sign up</h3>
+            <div class="form-group">
+              <label for="username" class="">Username:</label><br />
+              <input
+                minlength="4"
+                type="text"
+                name="username"
+                id="username"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password" class="">Password:</label><br />
+              <input
+                minlength="8"
+                type="password"
+                name="password"
+                id="password"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group mt-3">
+              <div class="d-flex justify-content-between">
+                <input
+                  type="submit"
+                  name="submit"
+                  class="btn btn-primary px-5"
+                  value="Sign up"
+                />
+                <a href="/" class="">Log in here</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    
   </body>
 </html>

@@ -130,19 +130,27 @@ app.post("/save-github-token", (req, res) => {
 });
 
 app.post("/save-google-spreadsheet", (req, res) => {
+  console.log(req.body);
   const id = req.body.spreadsheetId;
   const name = req.body.spreadsheetName;
   const nameRow = req.body.nameRow;
   const taskName = req.body.taskName;
   const taskRow = req.body.taskRow;
   let tasks;
-  if (taskName != undefined) {
+  if (typeof taskName == "Array") {
     tasks = taskName.map((task, i) => {
       return {
         name: task,
         row: taskRow[i],
       };
     });
+  } else if (typeof taskName == "string") {
+    tasks = [
+      {
+        name: taskName,
+        row: taskRow,
+      },
+    ];
   } else {
     tasks = [];
   }
