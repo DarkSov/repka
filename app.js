@@ -10,6 +10,7 @@ const bodyParser = require("body-parser");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 const GitHub = require("github-api");
 require("dotenv").config();
+var flash = require("connect-flash");
 
 const mongoDb = process.env.MONGO_URL;
 mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
@@ -31,13 +32,13 @@ app.set("views", __dirname);
 app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(flash());
 app.use(
   session({
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
-    
-
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 },
   })
 );
 
@@ -48,16 +49,15 @@ passport.use(
         return done(err);
       }
       if (!user) {
-        console.log("Incorrect username");
-        return done(null, false, { message: "Incorrect username" });
+        return done(null, false, { message: "Incorrect username or password" });
       }
       bcrypt.compare(password, user.password, (err, res) => {
         if (res) {
-          // passwords match! log user in
           return done(null, user);
         } else {
-          // passwords do not match!
-          return done(null, false, { message: "Incorrect password" });
+          return done(null, false, {
+            message: "Incorrect username or password",
+          });
         }
       });
     });
@@ -82,7 +82,7 @@ app.use(function (req, res, next) {
 });
 
 app.get("/", (req, res) => {
-  res.render("index", { user: req.user });
+  res.render("index", { user: req.user, message: req.flash("error") });
 });
 app.get("/sign-up", (req, res) => res.render("sign-up-form"));
 app.get("/log-out", (req, res) => {
@@ -94,11 +94,16 @@ app.get("/log-out", (req, res) => {
   });
 });
 
+app.get("/failed-login", function (req, res) {
+  res.redirect("/");
+});
+
 app.post(
   "/log-in",
   passport.authenticate("local", {
     successRedirect: "/",
-    failureRedirect: "/",
+    failureRedirect: "/failed-login",
+    failureFlash: true,
   })
 );
 app.post("/sign-up", (req, res, next) => {
