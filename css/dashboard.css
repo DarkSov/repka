@@ -1,0 +1,7 @@
+.table {
+  overflow: scroll;
+}
+table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}

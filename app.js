@@ -215,12 +215,12 @@ app.get("/get-student-repo", (req, res) => {
           sha: commit.sha,
           message: commit.commit.message,
           date: commit.commit.author.date,
+          author: commit.commit.author.name,
         };
       });
       data.forEach((commit) => {
         commit.date = new Date(commit.date);
       });
-      console.log(data);
       const commitsLastDay = data.filter((commit) => {
         return (
           commit.date.getTime() >= new Date().getTime() - 24 * 60 * 60 * 1000
