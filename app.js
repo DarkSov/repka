@@ -208,7 +208,7 @@ app.get("/get-student-repo", (req, res) => {
   const filter = req.query.filter == undefined ? "" : req.query.filter;
   const commits = gh
     .getRepo(username, repo)
-    .listCommits({ path: filter })
+    .listCommits({ path: filter, per_page: 100 })
     .then((commits) => {
       let data = commits.data.map((commit) => {
         return {
@@ -218,9 +218,11 @@ app.get("/get-student-repo", (req, res) => {
           author: commit.commit.author.name,
         };
       });
+
       data.forEach((commit) => {
         commit.date = new Date(commit.date);
       });
+
       const commitsLastDay = data.filter((commit) => {
         return (
           commit.date.getTime() >= new Date().getTime() - 24 * 60 * 60 * 1000
@@ -228,7 +230,7 @@ app.get("/get-student-repo", (req, res) => {
       });
       const commitsLastWeek = data.filter((commit) => {
         return (
-          commit.date.getDate() >=
+          commit.date.getTime() >=
             new Date().getTime() - 7 * 24 * 60 * 60 * 1000 &&
           commit.date.getTime() < new Date().getTime() - 24 * 60 * 60 * 1000
         );
@@ -245,9 +247,6 @@ app.get("/get-student-repo", (req, res) => {
         commitsLastWeek: commitsLastWeek,
         commitsLastMonth: commitsLastMonth,
       });
-    })
-    .then(() => {
-      console.log(commits);
     });
 });
 

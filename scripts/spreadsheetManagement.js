@@ -10,11 +10,53 @@ const studentFormTableContent = document.getElementById(
   "student-form-table-content"
 );
 const commitTableContent = document.getElementById("commit-table-content");
+const tabContent = document.getElementById("nav-tabContent");
 
 const navOverview = document.getElementById("nav-overview");
 const navCommits = document.getElementById("nav-commits");
 
 const tabs = document.getElementById("tabs");
+
+let generateChart = (data, headers) => {
+  let chart = document.createElement("table");
+  chart.classList.add(
+    "charts-css",
+    "column",
+    "show-labels",
+    "show-data-on-hover",
+    "hide-data"
+  );
+  chart.style.height = "300px";
+  chart.style.width = "500px";
+  chart.style.margin = "0 auto";
+  chart.style.maxWidth = "100%";
+
+  let tbody = document.createElement("tbody");
+
+  let maxElement = Math.max(...data);
+
+  data.forEach((row, index) => {
+    let tr = document.createElement("tr");
+
+    let th = document.createElement("th");
+    th.innerText = headers[index];
+    th.setAttribute("scope", "row");
+
+    let td = document.createElement("td");
+    td.innerHTML = `<span class="data">${row}</span>`;
+
+    td.style.setProperty("--size", row / maxElement);
+
+    tr.appendChild(th);
+    tr.appendChild(td);
+
+    tbody.appendChild(tr);
+  });
+
+  chart.appendChild(tbody);
+
+  return chart;
+};
 
 //sheet onchange
 sheetsSelect.addEventListener("change", (event) => {
@@ -38,6 +80,7 @@ sheetsSelect.addEventListener("change", (event) => {
           //student onclick
           student.addEventListener("click", (event) => {
             tabs.style.display = "none";
+            tabContent.style.display = "none";
 
             taskList.innerHTML = "";
             commitTableContent.innerHTML = "";
@@ -72,6 +115,8 @@ sheetsSelect.addEventListener("change", (event) => {
 
                 commitTableContent.innerHTML = "";
 
+                tabContent.style.display = "block";
+
                 taskList.childNodes.forEach((tab) => {
                   tab.classList.remove("active");
                 });
@@ -83,14 +128,16 @@ sheetsSelect.addEventListener("change", (event) => {
                   fetch(`/get-student-repo?username=${username}&repo=${repo}`)
                     .then((response) => response.json())
                     .then((data) => {
-                      const studentRepo = document.createElement("div");
-                      studentRepo.className = "student-repo";
-                      studentRepo.innerHTML = `${taskName} <a href="${taskLink}" target="_blank">${taskLink}</a>`;
-                      const studentCommits = document.createElement("div");
-                      studentCommits.className = "student-commits";
-                      studentCommits.innerHTML = `${data.commitsLastDay.length} commits in the last day <br> ${data.commitsLastWeek.length} commits in the last week <br> ${data.commitsLastMonth.length} commits in the last month`;
-                      navOverview.appendChild(studentRepo);
-                      navOverview.appendChild(studentCommits);
+                      let headers = ["30 days", "7 days", "24 hours"];
+                      let commitAmount = [
+                        data.commitsLastMonth.length,
+                        data.commitsLastWeek.length,
+                        data.commitsLastDay.length,
+                      ];
+
+                      let chart = generateChart(commitAmount, headers);
+
+                      navOverview.appendChild(chart);
 
                       const commits = data.commitsLastDay
                         .concat(data.commitsLastWeek)
@@ -113,7 +160,9 @@ sheetsSelect.addEventListener("change", (event) => {
 
                         let commitMessage = document.createElement("td");
                         commitMessage.className = "commit-message";
-                        commitMessage.innerHTML = commit.message;
+                        commitMessage.innerHTML = commit.message.split(
+                          "PiperOrigin-RevId: "
+                        )[0];
 
                         commitAuthor = document.createElement("td");
                         commitAuthor.className = "commit-author";

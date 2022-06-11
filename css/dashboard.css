@@ -5,3 +5,7 @@ table {
   table-layout: fixed;
   word-wrap: break-word;
 }
+.column {
+  height: 300px;
+  margin: 10px;
+}
