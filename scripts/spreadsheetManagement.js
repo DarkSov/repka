@@ -11,6 +11,7 @@ const studentFormTableContent = document.getElementById(
 );
 const commitTableContent = document.getElementById("commit-table-content");
 const tabContent = document.getElementById("nav-tabContent");
+const repoOptions = document.getElementById("repo-options");
 
 const navOverview = document.getElementById("nav-overview");
 const navCommits = document.getElementById("nav-commits");
@@ -28,7 +29,7 @@ let generateChart = (data, headers) => {
   );
   chart.style.height = "300px";
   chart.style.width = "500px";
-  chart.style.margin = "0 auto";
+  chart.style.margin = "10px";
   chart.style.maxWidth = "100%";
 
   let tbody = document.createElement("tbody");
@@ -128,6 +129,17 @@ sheetsSelect.addEventListener("change", (event) => {
                   fetch(`/get-student-repo?username=${username}&repo=${repo}`)
                     .then((response) => response.json())
                     .then((data) => {
+                      let commitAmountChartCaption =
+                        document.createElement("caption");
+                      commitAmountChartCaption.innerText =
+                        "Commit Amount Chart";
+                      commitAmountChartCaption.classList.add(
+                        "caption",
+                        "fw-bold"
+                      );
+                      commitAmountChartCaption.style.marginBottom = "10px";
+                      commitAmountChartCaption.style.width = "200px";
+
                       let headers = ["30 days", "7 days", "24 hours"];
                       let commitAmount = [
                         data.commitsLastMonth.length,
@@ -135,9 +147,55 @@ sheetsSelect.addEventListener("change", (event) => {
                         data.commitsLastDay.length,
                       ];
 
-                      let chart = generateChart(commitAmount, headers);
+                      let commitAmountChart = generateChart(
+                        commitAmount,
+                        headers
+                      );
 
-                      navOverview.appendChild(chart);
+                      let authorsChartCaption =
+                        document.createElement("caption");
+                      authorsChartCaption.innerText = "Authors Chart";
+                      authorsChartCaption.classList.add("caption", "fw-bold");
+                      authorsChartCaption.style.marginBottom = "10px";
+                      authorsChartCaption.style.width = "200px";
+
+                      let allCommits = data.commitsLastMonth.concat(
+                        data.commitsLastWeek,
+                        data.commitsLastDay
+                      );
+
+                      let authors = allCommits.map((commit) => commit.author);
+
+                      let uniqueAuthors = [...new Set(authors)];
+
+                      let authorCommits = uniqueAuthors.map((author) => {
+                        let authorCommits = data.commitsLastMonth.filter(
+                          (commit) => commit.author == author
+                        );
+                        return authorCommits.length;
+                      });
+
+                      if (uniqueAuthors.length >= 8) {
+                        while (uniqueAuthors.length >= 8) {
+                          let index = authorCommits.findIndex(
+                            (a) => a == Math.min(...authorCommits)
+                          );
+
+                          uniqueAuthors.splice(index, 1);
+                          authorCommits.splice(index, 1);
+                        }
+                      }
+
+                      let authorChart = generateChart(
+                        authorCommits,
+                        uniqueAuthors
+                      );
+
+                      navOverview.appendChild(commitAmountChartCaption);
+                      navOverview.appendChild(commitAmountChart);
+
+                      navOverview.appendChild(authorsChartCaption);
+                      navOverview.appendChild(authorChart);
 
                       const commits = data.commitsLastDay
                         .concat(data.commitsLastWeek)

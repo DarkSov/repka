@@ -150,7 +150,43 @@
           <ul class="list-group" id="student-list-group"></ul>
         </div>
         <div id="student-info" class="col-7 border" style="height: 900px">
-          <ul class="nav nav-pills" id="task-list"></ul>
+          <div class="row justify-content-between">
+            <div class="col-6">
+              <ul class="nav nav-pills" id="task-list"></ul>
+            </div>
+            <div class="col-6" id="repo-options" style="display:none">
+              <div class="d-flex flex-row justify-content-around">
+                <div class="input-group">
+                  <label class="input-group-text" for="branch-select"
+                    >Branch</label
+                  >
+                  <select class="form-select" id="branch-select">
+                    <option selected>Choose...</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Path"
+                    aria-label="Path"
+                    aria-describedby="button-addon2"
+                  />
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="button-addon2"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <nav id="tabs">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
               <button
