@@ -61,18 +61,22 @@ let generateChart = (data, headers) => {
 
 //sheet onchange
 sheetsSelect.addEventListener("change", (event) => {
-  studentListGroup.innerHTML = `<div id="spinner" class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>`;
-
   repoOptions.style.display = "none";
   tabs.style.display = "none";
   tabContent.style.display = "none";
   taskList.style.display = "none";
 
   const sheetId = sheetsSelect.value;
+
+  if (sheetId == "") {
+    studentListGroup.innerHTML = "";
+    return;
+  }
+
+  studentListGroup.innerHTML = `<div id="spinner" class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>`;
   const spinner = document.getElementById("spinner");
-  if (sheetId == "") return;
   fetch(`/get-google-spreadsheet?sheetId=${sheetId}`)
     .then((response) => response.json())
     .then((data) => {
