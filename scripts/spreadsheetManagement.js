@@ -64,6 +64,7 @@ sheetsSelect.addEventListener("change", (event) => {
   studentListGroup.innerHTML = `<div id="spinner" class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>`;
+  repoOptions.style.display = "none";
   const sheetId = sheetsSelect.value;
   const spinner = document.getElementById("spinner");
   if (sheetId == "") return;
@@ -82,6 +83,7 @@ sheetsSelect.addEventListener("change", (event) => {
           student.addEventListener("click", (event) => {
             tabs.style.display = "none";
             tabContent.style.display = "none";
+            repoOptions.style.display = "block";
 
             taskList.innerHTML = "";
             commitTableContent.innerHTML = "";
