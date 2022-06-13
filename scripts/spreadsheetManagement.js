@@ -20,6 +20,8 @@ const navCommits = document.getElementById("nav-commits");
 
 const tabs = document.getElementById("tabs");
 
+var currentLink = "";
+
 let generateChart = (data, headers) => {
   let chart = document.createElement("table");
   chart.classList.add(
@@ -61,6 +63,132 @@ let generateChart = (data, headers) => {
   return chart;
 };
 
+let loadRepo = (taskLink, branch) => {
+  commitTableContent.innerHTML = `<div id="spinner" class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>`;
+  navOverview.innerHTML = `<div id="spinner" class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>`;
+
+  commitTableContent.innerHTML = "";
+
+  let username = taskLink.split("/")[3];
+  let repo = taskLink.split("/")[4];
+
+  tabContent.style.display = "block";
+
+  taskList.childNodes.forEach((tab) => {
+    tab.classList.remove("active");
+  });
+  tabs.style.display = "inline-block";
+  fetch(`/get-student-repo?username=${username}&repo=${repo}&sha=${branch}`)
+    .then((response) => response.json())
+    .then((data) => {
+      let commitAmountChartCaption = document.createElement("caption");
+      commitAmountChartCaption.innerText = "Commit Amount Chart";
+      commitAmountChartCaption.classList.add("caption", "fw-bold");
+      commitAmountChartCaption.style.marginBottom = "10px";
+      commitAmountChartCaption.style.width = "200px";
+
+      let headers = ["30 days", "7 days", "24 hours"];
+      let commitAmount = [
+        data.commitsLastMonth.length,
+        data.commitsLastWeek.length,
+        data.commitsLastDay.length,
+      ];
+
+      let commitAmountChart = generateChart(commitAmount, headers);
+
+      let authorsChartCaption = document.createElement("caption");
+      authorsChartCaption.innerText = "Authors Chart";
+      authorsChartCaption.classList.add("caption", "fw-bold");
+      authorsChartCaption.style.marginBottom = "10px";
+      authorsChartCaption.style.width = "200px";
+
+      let allCommits = data.commitsLastMonth.concat(
+        data.commitsLastWeek,
+        data.commitsLastDay
+      );
+
+      let authors = allCommits.map((commit) => commit.author);
+
+      let uniqueAuthors = [...new Set(authors)];
+
+      let authorCommits = uniqueAuthors.map((author) => {
+        let authorCommits = data.commitsLastMonth.filter(
+          (commit) => commit.author == author
+        );
+        return authorCommits.length;
+      });
+
+      if (uniqueAuthors.length >= 8) {
+        while (uniqueAuthors.length >= 8) {
+          let index = authorCommits.findIndex(
+            (a) => a == Math.min(...authorCommits)
+          );
+
+          uniqueAuthors.splice(index, 1);
+          authorCommits.splice(index, 1);
+        }
+      }
+
+      let authorChart = generateChart(authorCommits, uniqueAuthors);
+
+      navOverview.appendChild(commitAmountChartCaption);
+      navOverview.appendChild(commitAmountChart);
+
+      navOverview.appendChild(authorsChartCaption);
+      navOverview.appendChild(authorChart);
+
+      const commits = data.commitsLastDay
+        .concat(data.commitsLastWeek)
+        .concat(data.commitsLastMonth);
+
+      const commitTable = document.createElement("table");
+      commitTable.className = "table";
+
+      commits.forEach((commit) => {
+        commitRow = document.createElement("tr");
+        commitRow.className = "commit-row";
+
+        let commitDate = document.createElement("td");
+        commitDate.className = "commit-date";
+        commitDate.innerHTML = new Date(commit.date)
+          .toString()
+          .split(" ")
+          .slice(0, 4)
+          .join(" ");
+
+        let commitMessage = document.createElement("td");
+        commitMessage.className = "commit-message";
+        commitMessage.innerHTML = commit.message.split(
+          "PiperOrigin-RevId: "
+        )[0];
+
+        commitAuthor = document.createElement("td");
+        commitAuthor.className = "commit-author";
+        commitAuthor.innerHTML = commit.author;
+
+        commitLink = document.createElement("td");
+        commitLink.className = "commit-link";
+        commitLink.innerHTML = `<a href="${
+          taskLink + "/commit/" + commit.sha
+        }" target="_blank">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        </a>`;
+
+        commitRow.appendChild(commitDate);
+        commitRow.appendChild(commitMessage);
+        commitRow.appendChild(commitAuthor);
+        commitRow.appendChild(commitLink);
+        commitTableContent.appendChild(commitRow);
+      });
+
+      let spinner = document.getElementById("spinner");
+      spinner.remove();
+    });
+};
 
 //sheet onchange
 sheetsSelect.addEventListener("change", (event) => {
@@ -129,8 +257,9 @@ sheetsSelect.addEventListener("change", (event) => {
               <span class="visually-hidden">Loading...</span>
             </div>`;
 
-                commitTableContent.innerHTML = "";
+                currentLink = taskLink;
 
+                commitTableContent.innerHTML = "";
                 tabContent.style.display = "block";
 
                 taskList.childNodes.forEach((tab) => {
@@ -254,22 +383,23 @@ sheetsSelect.addEventListener("change", (event) => {
                         commitRow.appendChild(commitAuthor);
                         commitRow.appendChild(commitLink);
                         commitTableContent.appendChild(commitRow);
-
-                        let branches = data.branches;
-                        branchSelect.innerHTML = "";
-
-                        branches.forEach((branch) => {
-                          let branchOption = document.createElement("option");
-                          branchOption.value = branch.sha;
-                          branchOption.innerText = branch.name;
-                          branchSelect.appendChild(branchOption);
-                        });
-                        let mainBranchIndex = branches.findIndex(
-                          (branch) =>
-                            branch.name == "master" || branch.name == "main"
-                        );
-                        branchSelect.selectedIndex = mainBranchIndex;
                       });
+
+                      let branches = data.branches;
+                      branchSelect.innerHTML = "";
+
+                      branches.forEach((branch) => {
+                        let branchOption = document.createElement("option");
+                        branchOption.value = branch.sha;
+                        branchOption.innerText = branch.name;
+                        branchSelect.appendChild(branchOption);
+                      });
+                      let mainBranchIndex = branches.findIndex(
+                        (branch) =>
+                          branch.name == "master" || branch.name == "main"
+                      );
+                      branchSelect.selectedIndex = mainBranchIndex;
+
                       let spinner = document.getElementById("spinner");
                       spinner.remove();
                     });
@@ -301,6 +431,10 @@ sheetsSelect.addEventListener("change", (event) => {
       });
       spinner.remove();
     });
+});
+
+branchSelect.addEventListener("change", (event) => {
+  loadRepo(currentLink, event.target.value);
 });
 
 let addTaskList = document.getElementById("add-task-list");
