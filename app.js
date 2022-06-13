@@ -242,11 +242,23 @@ app.get("/get-student-repo", (req, res) => {
           commit.date.getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000
         );
       });
-      res.json({
-        commitsLastDay: commitsLastDay,
-        commitsLastWeek: commitsLastWeek,
-        commitsLastMonth: commitsLastMonth,
-      });
+      gh.getRepo(username, repo)
+        .listBranches()
+        .then((branches) => {
+          let branchesList = branches.data.map((branch) => {
+            return {
+              name: branch.name,
+              sha: branch.commit.sha,
+            };
+          });
+          console.log(branchesList);
+          res.json({
+            commitsLastDay: commitsLastDay,
+            commitsLastWeek: commitsLastWeek,
+            commitsLastMonth: commitsLastMonth,
+            branches: branchesList,
+          });
+        });
     });
 });
 

@@ -13,6 +13,8 @@ const commitTableContent = document.getElementById("commit-table-content");
 const tabContent = document.getElementById("nav-tabContent");
 const repoOptions = document.getElementById("repo-options");
 
+const branchSelect = document.getElementById("branch-select");
+
 const navOverview = document.getElementById("nav-overview");
 const navCommits = document.getElementById("nav-commits");
 
@@ -58,6 +60,7 @@ let generateChart = (data, headers) => {
 
   return chart;
 };
+
 
 //sheet onchange
 sheetsSelect.addEventListener("change", (event) => {
@@ -251,6 +254,21 @@ sheetsSelect.addEventListener("change", (event) => {
                         commitRow.appendChild(commitAuthor);
                         commitRow.appendChild(commitLink);
                         commitTableContent.appendChild(commitRow);
+
+                        let branches = data.branches;
+                        branchSelect.innerHTML = "";
+
+                        branches.forEach((branch) => {
+                          let branchOption = document.createElement("option");
+                          branchOption.value = branch.sha;
+                          branchOption.innerText = branch.name;
+                          branchSelect.appendChild(branchOption);
+                        });
+                        let mainBranchIndex = branches.findIndex(
+                          (branch) =>
+                            branch.name == "master" || branch.name == "main"
+                        );
+                        branchSelect.selectedIndex = mainBranchIndex;
                       });
                       let spinner = document.getElementById("spinner");
                       spinner.remove();
