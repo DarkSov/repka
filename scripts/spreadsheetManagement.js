@@ -14,6 +14,8 @@ const tabContent = document.getElementById("nav-tabContent");
 const repoOptions = document.getElementById("repo-options");
 
 const branchSelect = document.getElementById("branch-select");
+const pathInput = document.getElementById("path-input");
+const pathButton = document.getElementById("path-button");
 
 const navOverview = document.getElementById("nav-overview");
 const navCommits = document.getElementById("nav-commits");
@@ -63,7 +65,7 @@ let generateChart = (data, headers) => {
   return chart;
 };
 
-let loadRepo = (taskLink, branch) => {
+let loadRepo = (taskLink, branch, path) => {
   commitTableContent.innerHTML = `<div id="spinner" class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>`;
@@ -82,7 +84,9 @@ let loadRepo = (taskLink, branch) => {
     tab.classList.remove("active");
   });
   tabs.style.display = "inline-block";
-  fetch(`/get-student-repo?username=${username}&repo=${repo}&sha=${branch}`)
+  fetch(
+    `/get-student-repo?username=${username}&repo=${repo}&sha=${branch}&path=${path}`
+  )
     .then((response) => response.json())
     .then((data) => {
       let commitAmountChartCaption = document.createElement("caption");
@@ -271,7 +275,7 @@ sheetsSelect.addEventListener("change", (event) => {
                 });
                 event.target.classList.add("active");
 
-                loadRepo(taskLink, "");
+                loadRepo(taskLink, "", "");
               });
               taskListElement.appendChild(taskButton);
               taskList.appendChild(taskListElement);
@@ -302,7 +306,11 @@ sheetsSelect.addEventListener("change", (event) => {
 });
 
 branchSelect.addEventListener("change", (event) => {
-  loadRepo(currentLink, event.target.value);
+  loadRepo(currentLink, event.target.value, pathInput.value);
+});
+
+pathButton.addEventListener("click", (event) => {
+  loadRepo(currentLink, branchSelect.value, pathInput.value);
 });
 
 let addTaskList = document.getElementById("add-task-list");
