@@ -22,6 +22,8 @@ const navCommits = document.getElementById("nav-commits");
 
 const tabs = document.getElementById("tabs");
 
+const spreadsheetList = document.getElementById("spreadsheet-list");
+
 var currentLink = "";
 
 let generateChart = (data, headers) => {
@@ -299,6 +301,7 @@ sheetsSelect.addEventListener("change", (event) => {
 
               studentFormTableContent.appendChild(dataRow);
             });
+
           });
           studentListGroup.appendChild(student);
         }
@@ -336,6 +339,9 @@ addTaskButton.addEventListener("click", (event) => {
   taskCol.required = true;
   addTaskList.appendChild(taskCol);
 });
+
+
+
 
 studentFormTable.style.display = "none";
 tabs.style.display = "none";

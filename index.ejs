@@ -141,6 +141,33 @@
             </div>
           </form>
         </div>
+
+        <div id="spreadsheet-management" class="mt-4">
+          <ul class="list-group" id="spreadsheet-list">
+            <% locals.currentUser.sheets.forEach(function(sheet) { %>
+            <li
+              class="list-group-item d-flex flex-row justify-content-between align-items-center"
+            >
+              <%= sheet.name %>
+              <div>
+                <a
+                  target="_blank"
+                  href="https://docs.google.com/spreadsheets/d/<%= sheet.id %>/edit"
+                  ><i class="bi bi-box-arrow-up-right"></i
+                ></a>
+
+                <button
+                  class="btn"
+                  type="button"
+                  data-sheet-id="<%= sheet.id %>"
+                >
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </li>
+            <% }); %>
+          </ul>
+        </div>
       </div>
     </div>
 
