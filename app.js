@@ -133,29 +133,31 @@ app.post("/save-google-spreadsheet", (req, res) => {
   console.log(req.body);
   const id = req.body.spreadsheetId;
   const name = req.body.spreadsheetName;
-  const nameRow = req.body.nameRow;
+  const nameCol = req.body.nameCol;
   const taskName = req.body.taskName;
-  const taskRow = req.body.taskRow;
+  const taskCol = req.body.taskCol;
   let tasks;
-  if (typeof taskName == "Array") {
+
+  console.log(taskName);
+  if (typeof taskName == "object") {
     tasks = taskName.map((task, i) => {
       return {
         name: task,
-        row: taskRow[i],
+        col: taskCol[i],
       };
     });
   } else if (typeof taskName == "string") {
     tasks = [
       {
         name: taskName,
-        row: taskRow,
+        col: taskCol,
       },
     ];
   } else {
     tasks = [];
   }
 
-  const sheet = { id: id, name: name, nameRow: nameRow, tasks: tasks };
+  const sheet = { id: id, name: name, nameCol: nameCol, tasks: tasks };
   let sheets = req.user.sheets;
   let index = sheets.findIndex((item) => item.name == name);
   if (index == -1) {
@@ -191,7 +193,7 @@ app.get("/get-google-spreadsheet", (req, res) => {
           data.unshift(rows[0]._sheet.headerValues);
           res.json({
             sheetData: data,
-            nameRow: currentSheet.nameRow,
+            nameCol: currentSheet.nameCol,
             tasks: currentSheet.tasks,
           });
         });

@@ -229,12 +229,11 @@ sheetsSelect.addEventListener("change", (event) => {
   fetch(`/get-google-spreadsheet?sheetId=${sheetId}`)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
       data.sheetData.forEach((row, index) => {
         if (index != 0) {
           let student = document.createElement("li");
           student.classList.add("list-group-item", "student");
-          student.innerHTML = row[data.nameRow - 1];
+          student.innerHTML = row[data.nameCol - 1];
           student.id = index;
 
           //student onclick
@@ -257,8 +256,8 @@ sheetsSelect.addEventListener("change", (event) => {
 
             data.tasks.forEach((task) => {
               const taskName = task.name;
-              const taskRow = task.row - 1;
-              const taskLink = data.sheetData[studentId][taskRow];
+              const taskCol = task.col - 1;
+              const taskLink = data.sheetData[studentId][taskCol];
 
               const taskListElement = document.createElement("li");
               taskListElement.classList.add("nav-item", "task");
@@ -324,13 +323,13 @@ addTaskButton.addEventListener("click", (event) => {
   taskName.setAttribute("placeholder", "Task name");
   taskName.required = true;
   addTaskList.appendChild(taskName);
-  const taskRow = document.createElement("input");
-  taskRow.classList.add("form-control", "my-2");
-  taskRow.setAttribute("type", "number");
-  taskRow.setAttribute("name", "taskRow");
-  taskRow.setAttribute("placeholder", "Row");
-  taskRow.required = true;
-  addTaskList.appendChild(taskRow);
+  const taskCol = document.createElement("input");
+  taskCol.classList.add("form-control", "my-2");
+  taskCol.setAttribute("type", "number");
+  taskCol.setAttribute("name", "taskCol");
+  taskCol.setAttribute("placeholder", "Column number");
+  taskCol.required = true;
+  addTaskList.appendChild(taskCol);
 });
 
 studentFormTable.style.display = "none";
