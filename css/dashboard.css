@@ -1,5 +1,8 @@
-.table .task-list {
+.table .task-list .student-list {
   overflow: scroll;
+}
+.student-list {
+  max-height: 900px;
 }
 table {
   table-layout: fixed;

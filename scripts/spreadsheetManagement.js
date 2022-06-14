@@ -246,6 +246,7 @@ sheetsSelect.addEventListener("change", (event) => {
             taskList.innerHTML = "";
             commitTableContent.innerHTML = "";
             navOverview.innerHTML = "";
+            currentLink = "";
 
             const studentId = event.target.id;
 
@@ -311,7 +312,9 @@ branchSelect.addEventListener("change", (event) => {
 });
 
 pathButton.addEventListener("click", (event) => {
-  loadRepo(currentLink, branchSelect.value, pathInput.value);
+  if (currentLink !== "") {
+    loadRepo(currentLink, branchSelect.value, pathInput.value);
+  }
 });
 
 let addTaskList = document.getElementById("add-task-list");
