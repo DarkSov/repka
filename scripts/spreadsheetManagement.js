@@ -241,7 +241,7 @@ sheetsSelect.addEventListener("change", (event) => {
             tabs.style.display = "none";
             tabContent.style.display = "none";
             repoOptions.style.display = "block";
-            taskList.style.display = "block";
+            taskList.style.display = "flex";
 
             taskList.innerHTML = "";
             commitTableContent.innerHTML = "";
@@ -260,9 +260,9 @@ sheetsSelect.addEventListener("change", (event) => {
               const taskLink = data.sheetData[studentId][taskCol];
 
               const taskListElement = document.createElement("li");
-              taskListElement.classList.add("nav-item", "task");
-              taskButton = document.createElement("p");
-              taskButton.classList.add("nav-link", "task-button");
+              taskListElement.classList.add("nav-item");
+              taskButton = document.createElement("a");
+              taskButton.classList.add("nav-link");
               taskButton.innerHTML = taskName;
 
               //task onclick
@@ -270,7 +270,9 @@ sheetsSelect.addEventListener("change", (event) => {
                 currentLink = taskLink;
 
                 taskList.childNodes.forEach((tab) => {
-                  tab.classList.remove("active");
+                  tab.childNodes.forEach((task) => {
+                    task.classList.remove("active");
+                  });
                 });
                 event.target.classList.add("active");
 
