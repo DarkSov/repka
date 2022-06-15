@@ -301,7 +301,6 @@ sheetsSelect.addEventListener("change", (event) => {
 
               studentFormTableContent.appendChild(dataRow);
             });
-
           });
           studentListGroup.appendChild(student);
         }
@@ -340,8 +339,24 @@ addTaskButton.addEventListener("click", (event) => {
   addTaskList.appendChild(taskCol);
 });
 
+const deleteSheetButtons = document.getElementsByClassName("delete-sheet");
 
-
-
+for (let i = 0; i < deleteSheetButtons.length; i++) {
+  deleteSheetButtons[i].addEventListener("click", (event) => {
+    fetch(
+      `/delete-google-spreadsheet?sheetId=${event.currentTarget.getAttribute(
+        "data-sheet-id"
+      )}`,
+      { method: "DELETE" }
+    )
+      .then((response) => {
+        location.reload();
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {});
+  });
+}
 studentFormTable.style.display = "none";
 tabs.style.display = "none";

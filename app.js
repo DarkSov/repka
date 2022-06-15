@@ -130,7 +130,6 @@ app.post("/save-github-token", (req, res) => {
 });
 
 app.post("/save-google-spreadsheet", (req, res) => {
-  console.log(req.body);
   const id = req.body.spreadsheetId;
   const name = req.body.spreadsheetName;
   const nameCol = req.body.nameCol;
@@ -138,7 +137,6 @@ app.post("/save-google-spreadsheet", (req, res) => {
   const taskCol = req.body.taskCol;
   let tasks;
 
-  console.log(taskName);
   if (typeof taskName == "object") {
     tasks = taskName.map((task, i) => {
       return {
@@ -265,6 +263,28 @@ app.get("/get-student-repo", (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+});
+
+app.delete("/delete-google-spreadsheet", (req, res) => {
+  const id = req.query.sheetId;
+  let sheets = res.locals.currentUser.sheets;
+  let index = sheets.findIndex((item) => item.id == id);
+
+  console.log(id);
+  console.log(sheets);
+
+  sheets.splice(index, 1);
+
+  console.log(sheets);
+
+  User.findByIdAndUpdate(req.user._id, { sheets: sheets }, (err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  }).catch((err) => {
+    console.log(err);
+  });
 });
 
 app.use(express.static(path.join(__dirname, "")));
