@@ -107,6 +107,10 @@ let loadRepo = (taskLink, branch, path) => {
   )
     .then((response) => response.json())
     .then((data) => {
+      let repoTitle = document.createElement("h5");
+      repoTitle.classList.add("py-2");
+      repoTitle.innerHTML = `${repo}    <a href="${taskLink}" target="_blank"><i class="bi bi-box-arrow-up-right"></a>`;
+
       let commitAmountChartCaption = document.createElement("caption");
       commitAmountChartCaption.innerText = "Commit Amount Chart";
       commitAmountChartCaption.classList.add("caption", "fw-bold");
@@ -160,6 +164,8 @@ let loadRepo = (taskLink, branch, path) => {
         }
 
         let authorChart = generateChart(authorCommits, uniqueAuthors);
+
+        navOverview.appendChild(repoTitle);
 
         navOverview.appendChild(commitAmountChartCaption);
         navOverview.appendChild(commitAmountChart);
