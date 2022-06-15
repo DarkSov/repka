@@ -120,107 +120,111 @@ let loadRepo = (taskLink, branch, path) => {
         data.commitsLastDay.length,
       ];
 
-      let commitAmountChart = generateChart(commitAmount, headers);
+      if (commitAmount.reduce((a, b) => a + b, 0) === 0) {
+        commitAmountChartCaption.innerText = "No commits found :(";
+        navOverview.appendChild(commitAmountChartCaption);
+      } else {
+        let commitAmountChart = generateChart(commitAmount, headers);
 
-      let authorsChartCaption = document.createElement("caption");
-      authorsChartCaption.innerText = "Authors Chart";
-      authorsChartCaption.classList.add("caption", "fw-bold");
-      authorsChartCaption.style.marginBottom = "10px";
-      authorsChartCaption.style.width = "200px";
+        let authorsChartCaption = document.createElement("caption");
+        authorsChartCaption.innerText = "Authors Chart";
+        authorsChartCaption.classList.add("caption", "fw-bold");
+        authorsChartCaption.style.marginBottom = "10px";
+        authorsChartCaption.style.width = "200px";
 
-      let allCommits = data.commitsLastMonth.concat(
-        data.commitsLastWeek,
-        data.commitsLastDay
-      );
-
-      let authors = allCommits.map((commit) => commit.author);
-
-      let uniqueAuthors = [...new Set(authors)];
-
-      let authorCommits = uniqueAuthors.map((author) => {
-        let authorCommits = data.commitsLastMonth.filter(
-          (commit) => commit.author == author
+        let allCommits = data.commitsLastMonth.concat(
+          data.commitsLastWeek,
+          data.commitsLastDay
         );
-        return authorCommits.length;
-      });
 
-      if (uniqueAuthors.length >= 8) {
-        while (uniqueAuthors.length >= 8) {
-          let index = authorCommits.findIndex(
-            (a) => a == Math.min(...authorCommits)
+        let authors = allCommits.map((commit) => commit.author);
+
+        let uniqueAuthors = [...new Set(authors)];
+
+        let authorCommits = uniqueAuthors.map((author) => {
+          let authorCommits = data.commitsLastMonth.filter(
+            (commit) => commit.author == author
           );
+          return authorCommits.length;
+        });
 
-          uniqueAuthors.splice(index, 1);
-          authorCommits.splice(index, 1);
+        if (uniqueAuthors.length >= 8) {
+          while (uniqueAuthors.length >= 8) {
+            let index = authorCommits.findIndex(
+              (a) => a == Math.min(...authorCommits)
+            );
+
+            uniqueAuthors.splice(index, 1);
+            authorCommits.splice(index, 1);
+          }
         }
-      }
 
-      let authorChart = generateChart(authorCommits, uniqueAuthors);
+        let authorChart = generateChart(authorCommits, uniqueAuthors);
 
-      navOverview.appendChild(commitAmountChartCaption);
-      navOverview.appendChild(commitAmountChart);
+        navOverview.appendChild(commitAmountChartCaption);
+        navOverview.appendChild(commitAmountChart);
 
-      navOverview.appendChild(authorsChartCaption);
-      navOverview.appendChild(authorChart);
+        navOverview.appendChild(authorsChartCaption);
+        navOverview.appendChild(authorChart);
 
-      const commits = data.commitsLastDay
-        .concat(data.commitsLastWeek)
-        .concat(data.commitsLastMonth);
+        const commits = data.commitsLastDay
+          .concat(data.commitsLastWeek)
+          .concat(data.commitsLastMonth);
 
-      const commitTable = document.createElement("table");
-      commitTable.className = "table";
+        const commitTable = document.createElement("table");
+        commitTable.className = "table";
 
-      commits.forEach((commit) => {
-        commitRow = document.createElement("tr");
-        commitRow.className = "commit-row";
+        commits.forEach((commit) => {
+          commitRow = document.createElement("tr");
+          commitRow.className = "commit-row";
 
-        let commitDate = document.createElement("td");
-        commitDate.className = "commit-date";
-        commitDate.innerHTML = new Date(commit.date)
-          .toString()
-          .split(" ")
-          .slice(0, 4)
-          .join(" ");
+          let commitDate = document.createElement("td");
+          commitDate.className = "commit-date";
+          commitDate.innerHTML = new Date(commit.date)
+            .toString()
+            .split(" ")
+            .slice(0, 4)
+            .join(" ");
 
-        let commitMessage = document.createElement("td");
-        commitMessage.className = "commit-message";
-        commitMessage.innerHTML = commit.message.split(
-          "PiperOrigin-RevId: "
-        )[0];
+          let commitMessage = document.createElement("td");
+          commitMessage.className = "commit-message";
+          commitMessage.innerHTML = commit.message.split(
+            "PiperOrigin-RevId: "
+          )[0];
 
-        commitAuthor = document.createElement("td");
-        commitAuthor.className = "commit-author";
-        commitAuthor.innerHTML = commit.author;
+          commitAuthor = document.createElement("td");
+          commitAuthor.className = "commit-author";
+          commitAuthor.innerHTML = commit.author;
 
-        commitLink = document.createElement("td");
-        commitLink.className = "commit-link";
-        commitLink.innerHTML = `<a href="${
-          taskLink + "/commit/" + commit.sha
-        }" target="_blank">
+          commitLink = document.createElement("td");
+          commitLink.className = "commit-link";
+          commitLink.innerHTML = `<a href="${
+            taskLink + "/commit/" + commit.sha
+          }" target="_blank">
                         <i class="bi bi-box-arrow-up-right"></i>
                         </a>`;
 
-        commitRow.appendChild(commitDate);
-        commitRow.appendChild(commitMessage);
-        commitRow.appendChild(commitAuthor);
-        commitRow.appendChild(commitLink);
-        commitTableContent.appendChild(commitRow);
-      });
+          commitRow.appendChild(commitDate);
+          commitRow.appendChild(commitMessage);
+          commitRow.appendChild(commitAuthor);
+          commitRow.appendChild(commitLink);
+          commitTableContent.appendChild(commitRow);
+        });
 
-      let branches = data.branches;
-      branchSelect.innerHTML = "";
+        let branches = data.branches;
+        branchSelect.innerHTML = "";
 
-      branches.forEach((branch) => {
-        let branchOption = document.createElement("option");
-        branchOption.value = branch.sha;
-        branchOption.innerText = branch.name;
-        branchSelect.appendChild(branchOption);
-      });
-      let mainBranchIndex = branches.findIndex(
-        (branch) => branch.name == "master" || branch.name == "main"
-      );
-      branchSelect.selectedIndex = mainBranchIndex;
-
+        branches.forEach((branch) => {
+          let branchOption = document.createElement("option");
+          branchOption.value = branch.sha;
+          branchOption.innerText = branch.name;
+          branchSelect.appendChild(branchOption);
+        });
+        let mainBranchIndex = branches.findIndex(
+          (branch) => branch.name == "master" || branch.name == "main"
+        );
+        branchSelect.selectedIndex = mainBranchIndex;
+      }
       let spinner = document.getElementById("spinner");
       spinner.remove();
     });
@@ -233,6 +237,7 @@ sheetsSelect.addEventListener("change", (event) => {
   tabContent.style.display = "none";
   taskList.style.display = "none";
 
+  studentFilter.value = "";
   const sheetId = sheetsSelect.value;
 
   if (sheetId == "") {
@@ -383,8 +388,7 @@ deleteSheetModalButton.addEventListener("click", (event) => {
     })
     .catch((error) => {
       console.log(error);
-    })
-    .finally(() => {});
+    });
 });
 
 studentFilter.addEventListener("keyup", (event) => {

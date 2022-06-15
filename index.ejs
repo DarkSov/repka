@@ -95,11 +95,11 @@
           <p class="fw-bold">Github settings</p>
           <form action="/save-github-token" class="form" method="POST">
             <label for="githubToken">Github token</label>
-            <div class="input-group mb-3">
+            <div class="input-group">
               <input
                 name="githubToken"
                 class="form-control"
-                type="password"
+                type="text"
                 placeholder="token"
                 required
               />
@@ -107,6 +107,15 @@
                 Save
               </button>
             </div>
+            <p class="fst-italic text-secondary mb-3 p-0 m-0">
+              You may get it
+              <a
+                class="p-0 m-0"
+                href="https://github.com/settings/tokens"
+                target="_blank"
+                >here</a
+              >
+            </p>
           </form>
         </div>
 
@@ -125,6 +134,12 @@
               type="text"
               required
             />
+            <p class="fst-italic text-secondary p-0 m-0">
+              Get id from sheet link: +docs.google.com/spreadsheets/d/
+              <span class="p-0 m-0 text-warning"
+                >e12vcqUIKjiYWRZzffLUIjgF3u2AUHSZsr23EywiFwre</span
+              >/...
+            </p>
             <label for="spreadsheetName">Name</label>
             <input
               class="form-control"
@@ -225,7 +240,7 @@
           <div class="input-group">
             <input
               type="text"
-              class="form-control"
+              class="form-control mb-2"
               placeholder="Student name"
               aria-label="studentName"
               id="student-filter"
