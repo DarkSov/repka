@@ -25,6 +25,7 @@ const tabs = document.getElementById("tabs");
 const spreadsheetList = document.getElementById("spreadsheet-list");
 
 var currentLink = "";
+var currentSheetToDelete = "";
 
 let generateChart = (data, headers) => {
   let chart = document.createElement("table");
@@ -340,23 +341,32 @@ addTaskButton.addEventListener("click", (event) => {
 });
 
 const deleteSheetButtons = document.getElementsByClassName("delete-sheet");
+const spreadsheetToDelete = document.getElementById("spreadsheet-to-delete");
 
 for (let i = 0; i < deleteSheetButtons.length; i++) {
   deleteSheetButtons[i].addEventListener("click", (event) => {
-    fetch(
-      `/delete-google-spreadsheet?sheetId=${event.currentTarget.getAttribute(
-        "data-sheet-id"
-      )}`,
-      { method: "DELETE" }
-    )
-      .then((response) => {
-        location.reload();
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {});
+    currentSheetToDelete = event.currentTarget.getAttribute("data-sheet-id");
+    spreadsheetToDelete.innerHTML =
+      event.currentTarget.getAttribute("data-sheet-name");
   });
 }
+
+const deleteSheetModalButton = document.getElementById(
+  "delete-sheet-modal-button"
+);
+
+deleteSheetModalButton.addEventListener("click", (event) => {
+  fetch(`/delete-google-spreadsheet?sheetId=${currentSheetToDelete}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      location.reload();
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+    .finally(() => {});
+});
+
 studentFormTable.style.display = "none";
 tabs.style.display = "none";
