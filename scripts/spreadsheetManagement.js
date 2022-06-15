@@ -17,6 +17,8 @@ const branchSelect = document.getElementById("branch-select");
 const pathInput = document.getElementById("path-input");
 const pathButton = document.getElementById("path-button");
 
+const studentFilter = document.getElementById("student-filter");
+
 const navOverview = document.getElementById("nav-overview");
 const navCommits = document.getElementById("nav-commits");
 
@@ -26,6 +28,19 @@ const spreadsheetList = document.getElementById("spreadsheet-list");
 
 var currentLink = "";
 var currentSheetToDelete = "";
+var currentStudentList = [];
+
+let getIndexesOfArrayElementsContainValue = (array, value) => {
+  var indices = [];
+
+  for (var i = 0; i < array.length; i++) {
+    if (array[i].toUpperCase().includes(value.toUpperCase())) {
+      indices.push(i);
+    }
+  }
+
+  return indices;
+};
 
 let generateChart = (data, headers) => {
   let chart = document.createElement("table");
@@ -232,6 +247,10 @@ sheetsSelect.addEventListener("change", (event) => {
   fetch(`/get-google-spreadsheet?sheetId=${sheetId}`)
     .then((response) => response.json())
     .then((data) => {
+      currentStudentList = data.sheetData.map(
+        (row, index) => row[data.nameCol - 1]
+      );
+      currentStudentList.shift();
       data.sheetData.forEach((row, index) => {
         if (index != 0) {
           let student = document.createElement("li");
@@ -366,6 +385,22 @@ deleteSheetModalButton.addEventListener("click", (event) => {
       console.log(error);
     })
     .finally(() => {});
+});
+
+studentFilter.addEventListener("keyup", (event) => {
+  const filter = event.target.value;
+  const filteredStudentsIndexes = getIndexesOfArrayElementsContainValue(
+    currentStudentList,
+    filter
+  );
+
+  studentListGroup.childNodes.forEach((student) => {
+    if (filteredStudentsIndexes.includes(parseInt(student.id - 1))) {
+      student.style.display = "block";
+    } else {
+      student.style.display = "none";
+    }
+  });
 });
 
 studentFormTable.style.display = "none";
