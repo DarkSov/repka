@@ -111,6 +111,7 @@ app.post("/sign-up", (req, res, next) => {
     const user = new User({
       username: req.body.username,
       password: hashedPassword,
+      githubToken: process.env.DEFAULT_GITHUB_TOKEN,
     }).save((err) => {
       if (err) {
         return next(err);
