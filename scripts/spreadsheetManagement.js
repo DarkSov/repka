@@ -256,8 +256,25 @@ sheetsSelect.addEventListener("change", (event) => {
     </div>`;
   const spinner = document.getElementById("spinner");
   fetch(`/get-google-spreadsheet?sheetId=${sheetId}`)
-    .then((response) => response.json())
+    .then((response) => {
+      console.log(response.status);
+      if (response.status !== 200) {
+        throw new Error(
+          "Failed to load Google Spreadsheet. Please check spreadsheet id, access for service email or try again later."
+        );
+      }
+      return response.json();
+    })
     .then((data) => {
+      if (data.error) throw new Error(data);
+      if (data.sheetData[0].length < data.nameCol) {
+        throw new Error("Name column not found");
+      }
+      data.tasks.forEach((task) => {
+        if (data.sheetData[0].length < task.col)
+          throw new Error("Task column not found");
+      });
+
       currentStudentList = data.sheetData.map(
         (row, index) => row[data.nameCol - 1]
       );
@@ -339,10 +356,11 @@ sheetsSelect.addEventListener("change", (event) => {
       });
     })
     .catch((error) => {
+      console.log(error);
       const studentListElement = document.createElement("li");
       studentListElement.classList.add("list-group-item", "text-danger");
-      studentListElement.innerHTML =
-        "Unable to access this Google Sheet. Please check sheet id or try again later.";
+
+      studentListElement.innerHTML = error.message;
 
       studentListGroup.appendChild(studentListElement);
       spinner.remove();

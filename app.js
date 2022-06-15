@@ -11,6 +11,9 @@ const { GoogleSpreadsheet } = require("google-spreadsheet");
 const GitHub = require("github-api");
 require("dotenv").config();
 var flash = require("connect-flash");
+const ErrorFactory = require("./errors");
+
+const errorFactory = new ErrorFactory();
 
 const mongoDb = process.env.MONGO_URL;
 mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
@@ -213,7 +216,7 @@ app.get("/get-google-spreadsheet", (req, res) => {
           });
         })
         .catch((err) => {
-          res.status(500).json({ error: err });
+          res.status(500).json(errorFactory.createError(err));
         });
     });
 });
