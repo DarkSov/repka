@@ -12,3 +12,6 @@ table {
   height: 300px;
   margin: 10px;
 }
+.custom-popover {
+  --bs-popover-max-width: 300px;
+}

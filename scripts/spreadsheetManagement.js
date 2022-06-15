@@ -30,6 +30,8 @@ var currentLink = "";
 var currentSheetToDelete = "";
 var currentStudentList = [];
 
+const sheetIdInfo = document.getElementById("sheet-id-info");
+
 let getIndexesOfArrayElementsContainValue = (array, value) => {
   var indices = [];
 

@@ -131,22 +131,39 @@
             method="POST"
           >
             <label for="spreadsheetId">Google spreadsheet ID</label>
-            <input
-              class="form-control"
-              name="spreadsheetId"
-              type="text"
-              required
-            />
-            <p class="fst-italic text-secondary p-0 m-0">
-              Get id from sheet link: docs.google.com/spreadsheets/d/
-              <span class="p-0 m-0 text-warning"
-                >e12vcqUIKjiYWRZzffLUIjgF3u2AUHSZsr23EywiFwre</span
-              >/...
-              <br />
-              Also your sheet should be public or grant access to the app
-              email.<br />
-              <span class="text-primary">repka-476@repka-352313.iam.gserviceaccount.com</span> 
-            </p>
+            <div class="input-group">
+              <input
+                class="form-control"
+                name="spreadsheetId"
+                type="text"
+                required
+              />
+              <button
+                class="btn btn-outline-secondary"
+                id="sheet-id-info"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#sheetIdInfo"
+                aria-expanded="false"
+                aria-controls="sheetIdInfo"
+              >
+                <i class="bi bi-info-circle"></i>
+              </button>
+            </div>
+            <div class="collapse" id="sheetIdInfo">
+              <p class="fst-italic text-secondary p-0 m-0">
+                Get id from sheet link: docs.google.com/spreadsheets/d/
+                <span class="p-0 m-0 text-warning"
+                  >e12vcqUIKjiYWRZzffLUIjgF3u2AUHSZsr23EywiFwre</span
+                >/...
+                <br />
+                Also your sheet should be public or grant access to the app
+                email.<br />
+                <span class="text-primary"
+                  >repka-476@repka-352313.iam.gserviceaccount.com</span
+                >
+              </p>
+            </div>
             <label for="spreadsheetName">Name</label>
             <input
               class="form-control"
