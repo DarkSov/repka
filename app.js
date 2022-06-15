@@ -121,12 +121,25 @@ app.post("/sign-up", (req, res, next) => {
 });
 app.post("/save-github-token", (req, res) => {
   const token = req.body.githubToken;
-  User.findByIdAndUpdate(req.user._id, { githubToken: token }, (err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/");
+
+  const gh = new GitHub({
+    token: token,
   });
+
+  const user = gh.getUser();
+  user
+    .listRepos()
+    .then((repos) => {
+      User.findByIdAndUpdate(req.user._id, { githubToken: token }, (err) => {
+        if (err) {
+          return next(err);
+        }
+        res.redirect("/");
+      });
+    })
+    .catch((err) => {
+      res.render("index", { user: req.user, message: "Invalid github token" });
+    });
 });
 
 app.post("/save-google-spreadsheet", (req, res) => {
