@@ -196,20 +196,25 @@ app.get("/get-google-spreadsheet", (req, res) => {
       private_key: process.env.GOOGLE_PRIVATE_KEY,
     })
     .then(() => {
-      doc.loadInfo().then(() => {
-        const sheet = doc.sheetsByIndex[0];
-        sheet.getRows().then((rows) => {
-          let data = rows.map((row) => {
-            return row._rawData;
+      doc
+        .loadInfo()
+        .then(() => {
+          const sheet = doc.sheetsByIndex[0];
+          sheet.getRows().then((rows) => {
+            let data = rows.map((row) => {
+              return row._rawData;
+            });
+            data.unshift(rows[0]._sheet.headerValues);
+            res.json({
+              sheetData: data,
+              nameCol: currentSheet.nameCol,
+              tasks: currentSheet.tasks,
+            });
           });
-          data.unshift(rows[0]._sheet.headerValues);
-          res.json({
-            sheetData: data,
-            nameCol: currentSheet.nameCol,
-            tasks: currentSheet.tasks,
-          });
+        })
+        .catch((err) => {
+          res.status(500).json({ error: err });
         });
-      });
     });
 });
 

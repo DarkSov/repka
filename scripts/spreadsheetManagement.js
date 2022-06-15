@@ -334,8 +334,17 @@ sheetsSelect.addEventListener("change", (event) => {
             });
           });
           studentListGroup.appendChild(student);
+          spinner.remove();
         }
       });
+    })
+    .catch((error) => {
+      const studentListElement = document.createElement("li");
+      studentListElement.classList.add("list-group-item", "text-danger");
+      studentListElement.innerHTML =
+        "Unable to access this Google Sheet. Please check sheet id or try again later.";
+
+      studentListGroup.appendChild(studentListElement);
       spinner.remove();
     });
 });
