@@ -11,7 +11,9 @@ const { GoogleSpreadsheet } = require("google-spreadsheet");
 const GitHub = require("github-api");
 require("dotenv").config();
 var flash = require("connect-flash");
+
 const ErrorFactory = require("./errors");
+const User = require("./schemas/User");
 
 const errorFactory = new ErrorFactory();
 
@@ -19,16 +21,6 @@ const mongoDb = process.env.MONGO_URL;
 mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongo connection error"));
-
-const User = mongoose.model(
-  "User",
-  new Schema({
-    username: { type: String, required: true },
-    password: { type: String, required: true },
-    githubToken: { type: String, required: false },
-    sheets: { type: Array, required: false },
-  })
-);
 
 const app = express();
 app.set("views", __dirname);
