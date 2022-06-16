@@ -136,6 +136,29 @@ app.post("/sign-up", (req, res, next) => {
     }
   });
 });
+app.post("/change-password", (req, res, next) => 
+{
+  const previousPassword = req.body.previousPassword.trim();
+  const password = req.body.password.trim();
+  if (password.length < 8) {
+    req.flash("error", "Password is too short");
+    return res.redirect("/");
+  } else {
+    bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
+      User.findOneAndUpdate(
+        { username: req.user.username },
+        { password: hashedPassword },
+        (err) => {
+          if (err) {
+            return next(err);
+          }
+          res.redirect("/");
+        }
+      );
+    });
+  }
+});
+
 app.post("/save-github-token", (req, res) => {
   const token = req.body.githubToken.trim();
 
