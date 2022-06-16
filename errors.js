@@ -29,17 +29,27 @@ class DoubleSubmitError extends ApplicationError {
   }
 }
 
+class UnauthorizedError extends ApplicationError {
+  constructor(message) {
+    super(message || "Unauthorized.", 401);
+  }
+}
+
 class ErrorFactory {
-  createError(error) {
+  createError(error, message) {
     if (error.status == 404 || error.response.status == 404) {
-      return new NotFoundError(error.message);
+      return new NotFoundError(message || error.message);
     }
     if (error.status == 400 || error.response.status == 400) {
-      return new BadRequestError(error.message);
+      return new BadRequestError(message || error.message);
     }
     if (error.status == 409 || error.response.status == 409) {
-      return new DoubleSubmitError(error.message);
+      return new DoubleSubmitError(message || error.message);
     }
+    if (error.status == 401 || error.response.status == 401) {
+      return new UnauthorizedError(message || error.message);
+    }
+
     return new ApplicationError(error.message, error.status);
   }
 }

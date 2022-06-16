@@ -79,7 +79,9 @@ app.use(function (req, res, next) {
 app.get("/", (req, res) => {
   res.render("index", { user: req.user, message: req.flash("error") });
 });
-app.get("/sign-up", (req, res) => res.render("sign-up-form"));
+app.get("/sign-up", (req, res) =>
+  res.render("sign-up-form", { message: req.flash("error") })
+);
 app.get("/log-out", (req, res) => {
   req.logout(function (err) {
     if (err) {
@@ -88,7 +90,6 @@ app.get("/log-out", (req, res) => {
     res.redirect("/");
   });
 });
-
 app.get("/failed-login", function (req, res) {
   res.redirect("/");
 });
@@ -102,17 +103,31 @@ app.post(
   })
 );
 app.post("/sign-up", (req, res, next) => {
-  bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-    const user = new User({
-      username: req.body.username,
-      password: hashedPassword,
-      githubToken: process.env.DEFAULT_GITHUB_TOKEN,
-    }).save((err) => {
-      if (err) {
-        return next(err);
-      }
-      res.redirect("/");
-    });
+  const username = req.body.username.toLowerCase().trim();
+  if (username.length <= 3) {
+    req.flash("error", "Username is too short");
+    return res.redirect("/sign-up");
+  }
+
+  User.findOne({ username: username }, (err, user) => {
+    console.log(user);
+    if (user) {
+      req.flash("error", "Username is already taken");
+      res.redirect("/sign-up");
+    } else {
+      bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
+        const user = new User({
+          username: username,
+          password: hashedPassword,
+          githubToken: process.env.DEFAULT_GITHUB_TOKEN,
+        }).save((err) => {
+          if (err) {
+            return next(err);
+          }
+          res.redirect("/");
+        });
+      });
+    }
   });
 });
 app.post("/save-github-token", (req, res) => {
@@ -135,6 +150,9 @@ app.post("/save-github-token", (req, res) => {
     })
     .catch((err) => {
       res.render("index", { user: req.user, message: "Invalid github token" });
+
+      //TODO: Implement error handling on client side
+      //res.status(500).send(errorFactory.createError(err, "Invalid github token"));
     });
 });
 
@@ -166,18 +184,27 @@ app.post("/save-google-spreadsheet", (req, res) => {
 
   const sheet = { id: id, name: name, nameCol: nameCol, tasks: tasks };
   let sheets = req.user.sheets;
-  let index = sheets.findIndex((item) => item.name == name);
-  if (index == -1) {
-    sheets.push(sheet);
-  } else {
-    sheets[index] = sheet;
-  }
-  User.findByIdAndUpdate(req.user._id, { sheets: sheets }, (err) => {
-    if (err) {
-      return next(err);
-    }
+
+  if (sheets.find((sheet) => sheet.id == id)) {
+    req.flash("error", "Spreadsheet with given id already exists");
     res.redirect("/");
-  });
+
+    //TODO: Implement error handling on client side
+    //res.status(500).send(errorFactory.createError(err, "Spreadsheet with given id already exists"));
+  } else {
+    let index = sheets.findIndex((item) => item.name == name);
+    if (index == -1) {
+      sheets.push(sheet);
+    } else {
+      sheets[index] = sheet;
+    }
+    User.findByIdAndUpdate(req.user._id, { sheets: sheets }, (err) => {
+      if (err) {
+        return next(err);
+      }
+      res.redirect("/");
+    });
+  }
 });
 
 app.get("/get-google-spreadsheet", (req, res) => {
@@ -275,7 +302,7 @@ app.get("/get-student-repo", (req, res) => {
         });
     })
     .catch((err) => {
-      console.log(err);
+      res.status(500).json(errorFactory.createError(err));
     });
 });
 
@@ -287,7 +314,9 @@ app.delete("/delete-google-spreadsheet", (req, res) => {
   console.log(id);
   console.log(sheets);
 
-  sheets.splice(index, 1);
+  if (index !== -1) {
+    sheets.splice(index, 1);
+  }
 
   console.log(sheets);
 
