@@ -233,7 +233,6 @@ app.post("/save-google-spreadsheet", (req, res) => {
   let sheets = req.user.sheets;
 
   if (sheets.find((sheet) => sheet.id == id && sheet.name !== name)) {
-    
     req.flash("error", "Spreadsheet with given id already exists");
     res.redirect("/");
 
@@ -380,4 +379,4 @@ app.delete("/delete-google-spreadsheet", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "")));
 
-app.listen(3000, () => console.log("app listening on port 3000!"));
+app.listen(80, () => console.log("app listening on port 3000!"));
