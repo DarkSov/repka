@@ -115,23 +115,29 @@ app.post("/sign-up", (req, res, next) => {
       req.flash("error", "Username is already taken");
       res.redirect("/sign-up");
     } else {
-      bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-        const user = new User({
-          username: username,
-          password: hashedPassword,
-          githubToken: process.env.DEFAULT_GITHUB_TOKEN,
-        }).save((err) => {
-          if (err) {
-            return next(err);
-          }
-          res.redirect("/");
+      const password = req.body.password.trim();
+      if (password.length < 8) {
+        req.flash("error", "Password is too short");
+        return res.redirect("/sign-up");
+      } else {
+        bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
+          const user = new User({
+            username: username,
+            password: hashedPassword,
+            githubToken: process.env.DEFAULT_GITHUB_TOKEN,
+          }).save((err) => {
+            if (err) {
+              return next(err);
+            }
+            res.redirect("/");
+          });
         });
-      });
+      }
     }
   });
 });
 app.post("/save-github-token", (req, res) => {
-  const token = req.body.githubToken;
+  const token = req.body.githubToken.trim();
 
   const gh = new GitHub({
     token: token,
@@ -182,7 +188,12 @@ app.post("/save-google-spreadsheet", (req, res) => {
     tasks = [];
   }
 
-  const sheet = { id: id, name: name, nameCol: nameCol, tasks: tasks };
+  const sheet = {
+    id: id.trim(),
+    name: name.trim(),
+    nameCol: nameCol,
+    tasks: tasks,
+  };
   let sheets = req.user.sheets;
 
   if (sheets.find((sheet) => sheet.id == id)) {

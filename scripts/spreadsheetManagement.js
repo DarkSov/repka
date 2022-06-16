@@ -95,8 +95,34 @@ let loadRepo = (taskLink, branch, path) => {
 
   commitTableContent.innerHTML = "";
 
+  if (typeof taskLink != "string" || !taskLink.includes("github.com")) {
+    tabContent.style.display = "block";
+    let spinner = document.getElementById("spinner");
+    spinner.remove();
+    let commitAmountChartCaption = document.createElement("caption");
+    commitAmountChartCaption.classList.add("caption", "fw-bold", "text-danger");
+    commitAmountChartCaption.style.marginBottom = "10px";
+    commitAmountChartCaption.style.width = "200px";
+    commitAmountChartCaption.innerText = "Invalid link to repository";
+    navOverview.appendChild(commitAmountChartCaption);
+    return;
+  }
+
   let username = taskLink.split("/")[3];
   let repo = taskLink.split("/")[4];
+
+  if (!username || !repo) {
+    tabContent.style.display = "block";
+    let spinner = document.getElementById("spinner");
+    spinner.remove();
+    let commitAmountChartCaption = document.createElement("caption");
+    commitAmountChartCaption.classList.add("caption", "fw-bold", "text-danger");
+    commitAmountChartCaption.style.marginBottom = "10px";
+    commitAmountChartCaption.style.width = "200px";
+    commitAmountChartCaption.innerText = "Invalid link to repository";
+    navOverview.appendChild(commitAmountChartCaption);
+    return;
+  }
 
   tabContent.style.display = "block";
 
@@ -427,7 +453,8 @@ deleteSheetModalButton.addEventListener("click", (event) => {
 });
 
 studentFilter.addEventListener("keyup", (event) => {
-  const filter = event.target.value;
+  const filter = event.target.value.trim();
+
   const filteredStudentsIndexes = getIndexesOfArrayElementsContainValue(
     currentStudentList,
     filter
