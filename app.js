@@ -136,27 +136,38 @@ app.post("/sign-up", (req, res, next) => {
     }
   });
 });
-app.post("/change-password", (req, res, next) => 
-{
+app.post("/change-password", (req, res, next) => {
   const previousPassword = req.body.previousPassword.trim();
-  const password = req.body.password.trim();
-  if (password.length < 8) {
+  const newPassword = req.body.newPassword.trim();
+
+  if (newPassword.length < 8) {
     req.flash("error", "Password is too short");
     return res.redirect("/");
-  } else {
-    bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-      User.findOneAndUpdate(
-        { username: req.user.username },
-        { password: hashedPassword },
-        (err) => {
-          if (err) {
-            return next(err);
-          }
-          res.redirect("/");
-        }
-      );
-    });
   }
+  User.findOne({ username: req.user.username }, (err, user) => {
+    if (err) {
+      return next(err);
+    }
+    bcrypt.compare(previousPassword, user.password, (err, res) => {
+      if (res) {
+        bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+          User.findOneAndUpdate(
+            { username: req.user.username },
+            { password: hashedPassword },
+            (err, user) => {
+              if (err) {
+                return next(err);
+              }
+              res.redirect("/");
+            }
+          );
+        });
+      } else {
+        req.flash("error", "Incorrect password");
+        res.redirect("/");
+      }
+    });
+  });
 });
 
 app.post("/save-github-token", (req, res) => {
