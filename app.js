@@ -137,6 +137,8 @@ app.post("/sign-up", (req, res, next) => {
   });
 });
 app.post("/change-password", (req, res, next) => {
+  //TODO: make client-side form
+
   const previousPassword = req.body.previousPassword.trim();
   const newPassword = req.body.newPassword.trim();
 
@@ -230,7 +232,8 @@ app.post("/save-google-spreadsheet", (req, res) => {
   };
   let sheets = req.user.sheets;
 
-  if (sheets.find((sheet) => sheet.id == id)) {
+  if (sheets.find((sheet) => sheet.id == id && sheet.name !== name)) {
+    
     req.flash("error", "Spreadsheet with given id already exists");
     res.redirect("/");
 
