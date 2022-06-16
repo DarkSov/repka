@@ -39,7 +39,7 @@ app.use(
 
 passport.use(
   new LocalStrategy((username, password, done) => {
-    User.findOne({ username: username }, (err, user) => {
+    User.findOne({ username: username.toLowerCase().trim() }, (err, user) => {
       if (err) {
         return done(err);
       }
