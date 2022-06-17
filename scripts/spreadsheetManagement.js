@@ -245,6 +245,8 @@ let loadRepo = (taskLink, branch, path) => {
           commitTableContent.appendChild(commitRow);
         });
 
+        //TODO: Add lazy loading for commits
+
         let branches = data.branches;
         branchSelect.innerHTML = "";
 
@@ -261,6 +263,22 @@ let loadRepo = (taskLink, branch, path) => {
       }
       let spinner = document.getElementById("spinner");
       spinner.remove();
+    })
+    .catch((error) => {
+      tabContent.style.display = "block";
+      let spinner = document.getElementById("spinner");
+      spinner.remove();
+      let commitAmountChartCaption = document.createElement("caption");
+      commitAmountChartCaption.classList.add(
+        "caption",
+        "fw-bold",
+        "text-danger"
+      );
+      commitAmountChartCaption.style.marginBottom = "10px";
+      commitAmountChartCaption.style.width = "200px";
+      commitAmountChartCaption.innerText =
+        "Invalid link to repository or repository is private to you";
+      navOverview.appendChild(commitAmountChartCaption);
     });
 };
 
