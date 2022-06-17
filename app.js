@@ -296,9 +296,10 @@ app.get("/get-student-repo", (req, res) => {
   const repo = req.query.repo;
   const filter = req.query.path == undefined ? "" : req.query.path;
   const branch = req.query.sha == undefined ? "" : req.query.sha;
+  const page = req.query.page || 1;
 
   gh.getRepo(username, repo)
-    .listCommits({ path: filter, per_page: 100, sha: branch, path: filter })
+    .listCommits({ path: filter, per_page: 100, sha: branch, path: filter, page: page })
     .then((commits) => {
       let data = commits.data.map((commit) => {
         return {
