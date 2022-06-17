@@ -20,6 +20,7 @@ const errorFactory = new ErrorFactory();
 const mongoDb = process.env.MONGO_URL;
 mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
 const db = mongoose.connection;
+
 db.on("error", console.error.bind(console, "mongo connection error"));
 
 const app = express();
@@ -210,14 +211,14 @@ app.post("/save-google-spreadsheet", (req, res) => {
     tasks = taskName.map((task, i) => {
       return {
         name: task,
-        col: taskCol[i],
+        col: taskCol[i] || 1,
       };
     });
   } else if (typeof taskName == "string") {
     tasks = [
       {
         name: taskName,
-        col: taskCol,
+        col: taskCol || 1,
       },
     ];
   } else {
